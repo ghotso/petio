@@ -10,43 +10,72 @@ const sanitize = require("sanitize-filename");
 const logger = require("../util/logger");
 const { movieLookup } = require("../tmdb/movie");
 const { showLookup } = require("../tmdb/show");
+const convertGermanChars = require("../util/germanCharMap");
 
 async function search(term) {
   logger.log("verbose", `TMDB Search ${term}`);
 
-  let [movies, shows, people, companies] = await Promise.all([
-    searchMovies(sanitize(term)),
-    searchShows(sanitize(term)),
-    searchPeople(sanitize(term)),
-    searchCompanies(sanitize(term)),
-  ]);
+  // Convert the search term to handle German special characters
+  const normalizedTerm = convertGermanChars(term);
+  
+  // If the normalized term is different from the original, search both
+  const searchTerms = normalizedTerm !== term ? [term, normalizedTerm] : [term];
+  
+  let allResults = await Promise.map(searchTerms, async (searchTerm) => {
+    return Promise.all([
+      searchMovies(sanitize(searchTerm)),
+      searchShows(sanitize(searchTerm)),
+      searchPeople(sanitize(searchTerm)),
+      searchCompanies(sanitize(searchTerm)),
+    ]);
+  });
+
+  // Merge and deduplicate results
+  let movies = mergeResults(allResults.map(result => result[0].results));
+  let shows = mergeResults(allResults.map(result => result[1].results));
+  let people = mergeResults(allResults.map(result => result[2].results));
+  let companies = mergeResults(allResults.map(result => result[3].results));
 
   await Promise.map(
-    movies.results,
+    movies,
     async (result, i) => {
       movieLookup(result.id, true);
       let res = await onServer("movie", false, false, result.id);
-      movies.results[i].on_server = res.exists;
+      movies[i].on_server = res.exists;
     },
     { concurrency: 10 }
   );
 
   await Promise.map(
-    shows.results,
+    shows,
     async (result, i) => {
       showLookup(result.id, true);
       let res = await onServer("show", false, false, result.id);
-      shows.results[i].on_server = res.exists;
+      shows[i].on_server = res.exists;
     },
     { concurrency: 10 }
   );
 
   return {
-    movies: movies.results,
-    shows: shows.results,
-    people: people.results,
-    companies: companies.results,
+    movies: movies,
+    shows: shows,
+    people: people,
+    companies: companies,
   };
+}
+
+// Helper function to merge and deduplicate results
+function mergeResults(resultsArrays) {
+  const seen = new Set();
+  return resultsArrays
+    .flat()
+    .filter(item => {
+      if (seen.has(item.id)) {
+        return false;
+      }
+      seen.add(item.id);
+      return true;
+    });
 }
 
 async function searchMovies(term) {
