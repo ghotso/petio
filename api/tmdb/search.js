@@ -53,7 +53,7 @@ async function searchMovies(term) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/movie?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/movie?query=${term}&language=de-DE&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -69,7 +69,7 @@ async function searchShows(term) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/tv?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/tv?query=${term}&language=de-DE&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -85,7 +85,7 @@ async function searchPeople(term) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/person?query=${term}&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
+  let url = `${tmdb}search/person?query=${term}&language=de-DE&include_adult=false&api_key=${tmdbApikey}&append_to_response=credits,videos`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -101,7 +101,7 @@ async function searchCompanies(term) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}search/company?query=${term}&api_key=${tmdbApikey}`;
+  let url = `${tmdb}search/company?query=${term}&language=de-DE&api_key=${tmdbApikey}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

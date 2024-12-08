@@ -56,17 +56,6 @@ async function trending() {
     { concurrency: 10 }
   );
 
-  for (let i = 0; i < tv.results.length; i++) {
-    let showData = await showLookup(tv.results[i].id, true);
-    tv.results[i] = {
-      on_server: showData.on_server,
-      name: showData.name,
-      poster_path: showData.poster_path,
-      first_air_date: showData.first_air_date,
-      id: showData.id,
-    };
-  }
-
   await Promise.map(person.results, async (result, i) => {
     person.results[i] = {
       id: result.id,
@@ -141,8 +130,6 @@ async function trending() {
   return data;
 }
 
-// Caching Layer
-
 async function getPerson() {
   let data = false;
   try {
@@ -182,14 +169,12 @@ async function getShows() {
   return data;
 }
 
-// Lookup layer
-
 async function personData() {
   logger.log("verbose", "Person from source not cache");
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/person/week?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/person/week?api_key=${tmdbApikey}&language=de-DE&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -203,7 +188,7 @@ async function moviesData() {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/movie/week?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/movie/week?api_key=${tmdbApikey}&language=de-DE&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -217,7 +202,7 @@ async function showsData() {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}trending/tv/week?api_key=${tmdbApikey}&append_to_response=images`;
+  let url = `${tmdb}trending/tv/week?api_key=${tmdbApikey}&language=de-DE&append_to_response=images`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

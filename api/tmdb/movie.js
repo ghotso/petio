@@ -102,7 +102,6 @@ async function movieLookup(id, minified = false) {
       delete movie.budget;
       delete movie.adult;
       delete movie.original_title;
-      // delete movie.production_companies;
       if (minified) {
         delete movie.credits;
         delete movie.backdrop_path;
@@ -137,8 +136,6 @@ async function movieLookup(id, minified = false) {
     }
   }
 }
-
-// Caching Layer
 
 async function getMovieData(id) {
   let data = false;
@@ -192,13 +189,11 @@ async function getCollection(id) {
   return data;
 }
 
-// Lookup Layer
-
 async function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&append_to_response=credits,videos,keywords,release_dates`;
+  let url = `${tmdb}movie/${id}?api_key=${tmdbApikey}&language=de-DE&append_to_response=credits,videos,keywords,release_dates`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     let data = res.data;
@@ -217,7 +212,7 @@ async function recommendationData(id, page = 1) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&page=${page}`;
+  let url = `${tmdb}movie/${id}/recommendations?api_key=${tmdbApikey}&language=de-DE&page=${page}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -230,8 +225,7 @@ async function collectionData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}collection/${id}?api_key=${tmdbApikey}`;
-
+  let url = `${tmdb}collection/${id}?api_key=${tmdbApikey}&language=de-DE`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -244,8 +238,7 @@ async function reviewsData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}movie/${id}/reviews?api_key=${tmdbApikey}`;
-
+  let url = `${tmdb}movie/${id}/reviews?api_key=${tmdbApikey}&language=de-DE`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -254,22 +247,20 @@ async function reviewsData(id) {
   }
 }
 
-// Lets i18n this soon
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
-    if (logo.lang === "en" && !logoUrl) {
+    if (logo.lang === "de" || logo.lang === "en") {
       logoUrl = logo.url;
     }
   });
   return logoUrl;
 }
 
-// Lets i18n this soon
 function findEnRating(data) {
   let rating = false;
   data.forEach((item) => {
-    if (item.iso_3166_1 === "US") {
+    if (item.iso_3166_1 === "DE" || item.iso_3166_1 === "US") {
       rating = item.release_dates[0].certification;
     }
   });
@@ -284,7 +275,7 @@ async function discoverMovie(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}${par}&page=${page}`;
+  let url = `${tmdb}discover/movie?api_key=${tmdbApikey}&language=de-DE${par}&page=${page}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -297,7 +288,7 @@ async function company(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}company/${id}?api_key=${tmdbApikey}`;
+  let url = `${tmdb}company/${id}?api_key=${tmdbApikey}&language=de-DE`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;

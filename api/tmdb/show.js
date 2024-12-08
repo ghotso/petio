@@ -153,8 +153,6 @@ async function showLookup(id, minified = false) {
   }
 }
 
-// Caching Layer
-
 async function getShowData(id) {
   let data = false;
   try {
@@ -220,13 +218,11 @@ async function getSeasons(seasons, id) {
   return data;
 }
 
-// Lookup layer
-
 async function tmdbData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
+  let url = `${tmdb}tv/${id}?api_key=${tmdbApikey}&language=de-DE&append_to_response=aggregate_credits,videos,keywords,content_ratings,credits`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     let data = res.data;
@@ -259,8 +255,7 @@ async function recommendationData(id, page = 1) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&page=${page}`;
-
+  let url = `${tmdb}tv/${id}/recommendations?api_key=${tmdbApikey}&language=de-DE&page=${page}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -285,7 +280,7 @@ async function getSeason(id, season) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/season/${season}?api_key=${tmdbApikey}`;
+  let url = `${tmdb}tv/${id}/season/${season}?api_key=${tmdbApikey}&language=de-DE`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -298,8 +293,7 @@ async function reviewsData(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}tv/${id}/reviews?api_key=${tmdbApikey}`;
-
+  let url = `${tmdb}tv/${id}/reviews?api_key=${tmdbApikey}&language=de-DE`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -308,22 +302,20 @@ async function reviewsData(id) {
   }
 }
 
-// Lets i18n this soon
 function findEnLogo(logos) {
   let logoUrl = false;
   logos.forEach((logo) => {
-    if (logo.lang === "en" && !logoUrl) {
+    if (logo.lang === "de" || logo.lang === "en") {
       logoUrl = logo.url;
     }
   });
   return logoUrl;
 }
 
-// Lets i18n this soon
 function findEnRating(data) {
   let rating = false;
   data.forEach((item) => {
-    if (item.iso_3166_1 === "US") {
+    if (item.iso_3166_1 === "DE" || item.iso_3166_1 === "US") {
       rating = item.rating;
     }
   });
@@ -352,7 +344,7 @@ async function discoverSeries(page = 1, params = {}) {
   Object.keys(params).map((i) => {
     par += `&${i}=${params[i]}`;
   });
-  let url = `${tmdb}discover/tv?api_key=${tmdbApikey}${par}&page=${page}`;
+  let url = `${tmdb}discover/tv?api_key=${tmdbApikey}&language=de-DE${par}&page=${page}`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
@@ -365,7 +357,7 @@ async function network(id) {
   const config = getConfig();
   const tmdbApikey = config.tmdbApi;
   const tmdb = "https://api.themoviedb.org/3/";
-  let url = `${tmdb}network/${id}?api_key=${tmdbApikey}`;
+  let url = `${tmdb}network/${id}?api_key=${tmdbApikey}&language=de-DE`;
   try {
     let res = await axios.get(url, { httpAgent: agent });
     return res.data;
